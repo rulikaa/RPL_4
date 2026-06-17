@@ -24,7 +24,7 @@
           </div>
 
           <div>
-            <label class="block text-xs font-semibold text-gray-500 uppercase mb-2">Email address / Username</label>
+            <label class="block text-xs font-semibold text-gray-500 uppercase mb-2">Username</label>
             <input type="text" v-model="username" class="w-full border-b-2 border-gray-200 focus:border-green-700 outline-none py-2 transition-colors bg-transparent" placeholder="Masukkan username" required />
           </div>
           

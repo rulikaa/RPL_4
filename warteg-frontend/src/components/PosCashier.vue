@@ -2,16 +2,18 @@
   <div class="min-h-screen bg-gray-50 flex flex-col md:flex-row">
     <!-- Main POS body -->
     <div class="w-full md:w-2/3 p-4 md:p-6 flex flex-col h-screen overflow-hidden">
-      <header class="flex justify-between items-center mb-6">
+      <header class="flex justify-between items-center mb-6 gap-2 shrink-0">
         <div>
-          <h1 class="text-2xl font-bold text-gray-800">Warteg.co POS</h1>
-          <p class="text-sm text-gray-500">Petugas: <span class="font-semibold text-green-800">{{ currentUser.name || 'Kasir' }}</span> ({{ currentUser.role || 'cashier' }})</p>
+          <h1 class="text-xl sm:text-2xl font-bold text-gray-800">Warteg.co POS</h1>
+          <p class="text-[10px] sm:text-xs text-gray-500">Petugas: <span class="font-semibold text-green-800">{{ currentUser.name || 'Kasir' }}</span> <span class="hidden sm:inline">({{ currentUser.role || 'cashier' }})</span></p>
         </div>
-        <div class="flex items-center gap-3">
-          <button v-if="currentUser.role === 'admin'" @click="$emit('go-to-dashboard')" class="bg-green-50 text-green-800 hover:bg-green-100 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 shadow-sm">
-            <span>📊</span> Dashboard
+        <div class="flex items-center gap-2 shrink-0">
+          <button v-if="currentUser.role === 'admin'" @click="$emit('go-to-dashboard')" class="bg-green-50 text-green-800 hover:bg-green-100 text-[10px] sm:text-xs font-bold px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl transition-all cursor-pointer flex items-center gap-1 shadow-sm">
+            <span>📊</span> <span class="hidden sm:inline">Dashboard</span>
           </button>
-          <button @click="$emit('logout')" class="text-red-500 text-sm font-semibold hover:underline cursor-pointer">Keluar</button>
+          <button @click="$emit('logout')" class="bg-red-50 text-red-600 hover:bg-red-100 text-[10px] sm:text-xs font-bold px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl transition-all cursor-pointer flex items-center gap-1 shadow-sm">
+            <span>🚪</span> <span class="hidden sm:inline">Keluar</span><span class="sm:hidden">Keluar</span>
+          </button>
         </div>
       </header>
 
@@ -54,6 +56,9 @@
       </div>
     </div>
 
+    <!-- Mobile Cart Backdrop Overlay -->
+    <div v-if="isCartOpen && isMobile" @click="isCartOpen = false" class="md:hidden fixed inset-0 bg-black/40 z-40 backdrop-blur-xs transition-opacity duration-300"></div>
+
     <!-- Right Side Cart Drawer -->
     <div class="w-full md:w-1/3 bg-white border-l border-gray-200 shadow-xl md:shadow-none fixed md:relative bottom-0 md:bottom-auto h-[60vh] md:h-screen flex flex-col rounded-t-3xl md:rounded-none z-50 transform transition-transform duration-300" 
          :class="{'translate-y-full md:translate-y-0': !isCartOpen && isMobile}">
@@ -75,16 +80,22 @@
           <div v-if="cart.length === 0" class="text-center text-gray-400 mt-10 text-sm">
             Belum ada pesanan
           </div>
-          <div v-for="(cartItem, index) in cart" :key="index" class="flex justify-between items-center border-b border-gray-100 pb-3">
-            <div class="w-1/2">
-              <h4 class="font-semibold text-sm text-gray-800 line-clamp-1">{{ cartItem.name }}</h4>
-              <p class="text-xs text-gray-500">Rp {{ cartItem.price.toLocaleString('id-ID') }}</p>
+          <div v-for="(cartItem, index) in cart" :key="index" class="flex justify-between items-center border-b border-gray-100 pb-3 gap-2">
+            <div class="flex-1 min-w-0 pr-2">
+              <h4 class="font-semibold text-sm text-gray-800 truncate">{{ cartItem.name }}</h4>
+              <p class="text-[11px] text-gray-400">Rp {{ cartItem.price.toLocaleString('id-ID') }}</p>
             </div>
             
-            <div class="flex items-center bg-gray-100 rounded-lg p-1">
-              <button @click="updateQty(index, -1)" class="w-6 h-6 flex items-center justify-center text-gray-600 font-bold hover:bg-white rounded cursor-pointer">-</button>
-              <span class="w-8 text-center text-sm font-semibold">{{ cartItem.qty }}</span>
-              <button @click="updateQty(index, 1)" class="w-6 h-6 flex items-center justify-center text-gray-600 font-bold hover:bg-white rounded cursor-pointer">+</button>
+            <div class="flex items-center gap-3 shrink-0">
+              <div class="flex items-center bg-gray-100 rounded-lg p-0.5">
+                <button @click="updateQty(index, -1)" class="w-6 h-6 flex items-center justify-center text-gray-600 font-bold hover:bg-white rounded cursor-pointer text-xs">-</button>
+                <span class="w-6 text-center text-xs font-semibold">{{ cartItem.qty }}</span>
+                <button @click="updateQty(index, 1)" class="w-6 h-6 flex items-center justify-center text-gray-600 font-bold hover:bg-white rounded cursor-pointer text-xs">+</button>
+              </div>
+              
+              <span class="font-bold text-xs text-gray-800 min-w-[75px] text-right shrink-0">
+                Rp {{ (cartItem.price * cartItem.qty).toLocaleString('id-ID') }}
+              </span>
             </div>
           </div>
         </div>

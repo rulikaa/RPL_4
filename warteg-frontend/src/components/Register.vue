@@ -46,15 +46,13 @@
 
           <div>
             <label class="block text-xs font-semibold text-gray-500 uppercase mb-2">Role Akun (Hak Akses)</label>
-            <div class="flex gap-6 mt-1">
-              <label class="flex items-center gap-2 cursor-pointer text-sm font-semibold text-gray-700">
-                <input type="radio" value="admin" v-model="form.role" class="accent-green-800 w-4 h-4 cursor-pointer" />
-                <span>Pemilik (Admin)</span>
-              </label>
-              <label class="flex items-center gap-2 cursor-pointer text-sm font-semibold text-gray-700">
-                <input type="radio" value="cashier" v-model="form.role" class="accent-green-800 w-4 h-4 cursor-pointer" />
-                <span>Karyawan (Kasir)</span>
-              </label>
+            <div class="grid grid-cols-2 gap-2 mt-1 bg-gray-50 p-1.5 rounded-xl border border-gray-200">
+              <button type="button" @click="form.role = 'admin'" :class="['py-2.5 px-3 rounded-lg text-xs font-bold transition-all cursor-pointer text-center flex items-center justify-center gap-1.5', form.role === 'admin' ? 'bg-green-800 text-white shadow-sm' : 'bg-transparent text-gray-500 hover:text-gray-800']">
+                💼 Pemilik (Admin)
+              </button>
+              <button type="button" @click="form.role = 'cashier'" :class="['py-2.5 px-3 rounded-lg text-xs font-bold transition-all cursor-pointer text-center flex items-center justify-center gap-1.5', form.role === 'cashier' ? 'bg-green-800 text-white shadow-sm' : 'bg-transparent text-gray-500 hover:text-gray-800']">
+                🧑‍🍳 Karyawan (Kasir)
+              </button>
             </div>
           </div>
           

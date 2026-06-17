@@ -37,7 +37,7 @@
           <p class="text-xs text-gray-500 hidden md:block mt-0.5">{{ pageSubtitle }}</p>
         </div>
         <div class="flex items-center gap-3">
-          <div class="text-right">
+          <div class="text-right hidden sm:block">
             <p class="font-bold text-sm text-gray-800">{{ todayFormatted }}</p>
             <p class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Pemilik Warteg: {{ currentUser.name || 'Admin' }}</p>
           </div>
@@ -473,7 +473,7 @@ const refreshAllData = async () => {
     menuList.value = menusData.map(item => ({
       id: item.id,
       name: item.name,
-      category: item.categories ? item.categories.name : mapCategoryIdToName(item.category_id),
+      category: mapCategoryIdToName(item.category_id),
       categoryId: item.category_id,
       price: item.price,
       available: item.is_available,

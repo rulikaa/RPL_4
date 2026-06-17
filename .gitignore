@@ -1,1 +1,5 @@
+node_modules/
+dist/
 warteg-backend/.env
+.DS_Store
+*.log

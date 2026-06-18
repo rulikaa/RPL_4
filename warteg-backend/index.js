@@ -13,6 +13,10 @@ const JWT_SECRET = process.env.JWT_SECRET || 'wartegpos_super_secret_session_key
 app.use(cors());
 app.use(express.json());
 
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', service: 'warteg-backend' });
+});
+
 // Helper middleware to verify JWT
 const authenticateJWT = (req, res, next) => {
   const authHeader = req.headers.authorization;

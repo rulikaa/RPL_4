@@ -8,21 +8,21 @@
       </div>
       <nav class="space-y-2 flex-1">
         <button @click="activeTab = 'dashboard'" :class="['w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all cursor-pointer', activeTab === 'dashboard' ? 'bg-green-800 text-white shadow-md shadow-green-800/20' : 'text-gray-500 hover:bg-gray-50']">
-          <span>📊</span> Dashboard
+          Dashboard
         </button>
         <button @click="activeTab = 'menu'" :class="['w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all cursor-pointer', activeTab === 'menu' ? 'bg-green-800 text-white shadow-md shadow-green-800/20' : 'text-gray-500 hover:bg-gray-50']">
-          <span>🍲</span> Manajemen Lauk
+          Manajemen Lauk
         </button>
         <button @click="activeTab = 'transactions'" :class="['w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all cursor-pointer', activeTab === 'transactions' ? 'bg-green-800 text-white shadow-md shadow-green-800/20' : 'text-gray-500 hover:bg-gray-50']">
-          <span>🧾</span> Catatan Transaksi
+          Catatan Transaksi
         </button>
       </nav>
       <div class="mt-auto border-t border-gray-100 pt-4 space-y-1">
         <button @click="$emit('go-to-cashier')" class="w-full text-left px-4 py-3 text-green-800 font-bold hover:bg-green-50 rounded-xl transition-colors flex items-center gap-2 cursor-pointer">
-          <span>📺</span> Buka POS Kasir
+          Buka POS Kasir
         </button>
         <button @click="$emit('logout')" class="w-full text-left px-4 py-3 text-red-500 font-bold hover:bg-red-50 rounded-xl transition-colors flex items-center gap-2 cursor-pointer">
-          <span>➔</span> Keluar / Logout
+          Keluar / Logout
         </button>
       </div>
     </aside>
@@ -51,7 +51,7 @@
         
         <!-- Global Loading Indicator -->
         <div v-if="isLoadingData" class="flex flex-col items-center justify-center h-64 text-gray-500">
-          <span class="animate-spin text-3xl mb-2">⏳</span>
+          <div class="w-8 h-8 mb-2 border-2 border-gray-300 border-t-green-700 rounded-full animate-spin"></div>
           <p class="text-sm font-medium">Memuat data dari database...</p>
         </div>
 
@@ -81,7 +81,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <!-- Top Selling dishes -->
               <div class="space-y-3">
-                <h4 class="font-bold text-gray-900 text-base flex items-center gap-2">🔥 Total Penjualan Lauk Bulan Ini</h4>
+                <h4 class="font-bold text-gray-900 text-base">Total Penjualan Lauk Bulan Ini</h4>
                 <div v-if="stats.topSelling.length === 0" class="bg-white p-6 rounded-xl border border-gray-200 text-center text-gray-400 text-sm shadow-sm">
                   Belum ada data penjualan
                 </div>
@@ -98,7 +98,7 @@
 
               <!-- Recent transactions -->
               <div class="space-y-3">
-                <h4 class="font-bold text-gray-900 text-base flex items-center gap-2">⏱️ Transaksi Terbaru</h4>
+                <h4 class="font-bold text-gray-900 text-base">Transaksi Terbaru</h4>
                 <div v-if="stats.recentTransactions.length === 0" class="bg-white p-6 rounded-xl border border-gray-200 text-center text-gray-400 text-sm shadow-sm">
                   Belum ada transaksi hari ini
                 </div>
@@ -210,7 +210,7 @@
                 </div>
                 <div class="flex items-center gap-3">
                   <h4 class="font-black text-base text-gray-800">Rp {{ trx.total_amount.toLocaleString('id-ID') }}</h4>
-                  <span class="text-gray-300 group-hover:text-green-700 transform group-hover:translate-x-1 transition-all">➔</span>
+                    <svg class="w-4 h-4 text-gray-300 group-hover:text-green-700 transform group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                 </div>
               </div>
             </div>
@@ -223,15 +223,12 @@
     <!-- Mobile Bottom Navigation -->
     <nav class="md:hidden fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 flex justify-around pb-safe z-40 shadow-xl">
       <button @click="activeTab = 'dashboard'" :class="['flex flex-col items-center pt-3 pb-2 w-1/3 transition-all cursor-pointer', activeTab === 'dashboard' ? 'text-green-800 font-black border-t-2 border-green-800' : 'text-gray-400']">
-        <span class="text-xl mb-0.5">📊</span>
         <span class="text-[10px] uppercase font-bold tracking-wide">Dashboard</span>
       </button>
       <button @click="activeTab = 'menu'" :class="['flex flex-col items-center pt-3 pb-2 w-1/3 transition-all cursor-pointer', activeTab === 'menu' ? 'text-green-800 font-black border-t-2 border-green-800' : 'text-gray-400']">
-        <span class="text-xl mb-0.5">🍲</span>
         <span class="text-[10px] uppercase font-bold tracking-wide">Lauk</span>
       </button>
       <button @click="activeTab = 'transactions'" :class="['flex flex-col items-center pt-3 pb-2 w-1/3 transition-all cursor-pointer', activeTab === 'transactions' ? 'text-green-800 font-black border-t-2 border-green-800' : 'text-gray-400']">
-        <span class="text-xl mb-0.5">🧾</span>
         <span class="text-[10px] uppercase font-bold tracking-wide">Transaksi</span>
       </button>
     </nav>
@@ -241,7 +238,10 @@
       <div class="bg-white rounded-3xl w-full max-w-md overflow-hidden flex flex-col max-h-[90vh] shadow-2xl">
         <div class="p-6 overflow-y-auto">
           <div class="flex items-center gap-3 mb-6 pb-2 border-b border-gray-100">
-            <button @click="showAddModal = false" class="text-gray-400 hover:text-gray-800 font-bold text-lg cursor-pointer">←</button>
+            <button @click="showAddModal = false" class="text-gray-400 hover:text-gray-800 font-bold cursor-pointer flex items-center gap-1">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+              <span class="text-xs">Kembali</span>
+            </button>
             <h3 class="text-lg font-black text-gray-900">Tambah Lauk</h3>
           </div>
           
@@ -285,7 +285,9 @@
     <!-- EDIT LAUK MODAL -->
     <div v-if="showEditModal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in">
       <div class="bg-white rounded-3xl w-full max-w-sm p-6 relative shadow-2xl">
-        <button @click="showEditModal = false" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800 font-bold text-base cursor-pointer">✕</button>
+        <button @click="showEditModal = false" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800 font-bold cursor-pointer">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
         <h3 class="text-lg font-black text-gray-900 mb-5 border-b border-gray-100 pb-2">Edit Data Lauk</h3>
         
         <div class="space-y-4 mb-6">
@@ -340,7 +342,9 @@
             <h3 class="font-black text-lg text-gray-900">Detail Pesanan</h3>
             <p class="text-[10px] text-gray-400 font-medium mt-0.5">{{ formatDate(selectedTransaction.transaction_time) }} pukul {{ formatTime(selectedTransaction.transaction_time) }}</p>
           </div>
-          <button @click="showDetailModal = false" class="text-gray-400 hover:text-gray-800 font-bold text-lg cursor-pointer">✕</button>
+          <button @click="showDetailModal = false" class="text-gray-400 hover:text-gray-800 font-bold cursor-pointer">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
         </div>
 
         <!-- Dynamic details list -->

@@ -9,10 +9,10 @@
         </div>
         <div class="flex items-center gap-2 shrink-0">
           <button v-if="currentUser.role === 'admin'" @click="$emit('go-to-dashboard')" class="bg-green-50 text-green-800 hover:bg-green-100 text-[10px] sm:text-xs font-bold px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl transition-all cursor-pointer flex items-center gap-1 shadow-sm">
-            <span>📊</span> <span class="hidden sm:inline">Dashboard</span>
+            <span class="hidden sm:inline">Dashboard</span>
           </button>
           <button @click="$emit('logout')" class="bg-red-50 text-red-600 hover:bg-red-100 text-[10px] sm:text-xs font-bold px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl transition-all cursor-pointer flex items-center gap-1 shadow-sm">
-            <span>🚪</span> <span class="hidden sm:inline">Keluar</span><span class="sm:hidden">Keluar</span>
+            <span class="hidden sm:inline">Keluar</span><span class="sm:hidden">Keluar</span>
           </button>
         </div>
       </header>
@@ -30,7 +30,7 @@
       <!-- Menu Grid -->
       <div class="flex-1 overflow-y-auto pr-2 pb-24 md:pb-4">
         <div v-if="isLoading" class="flex flex-col items-center justify-center h-48 text-gray-500">
-          <span class="animate-spin text-3xl mb-2">⏳</span>
+          <div class="w-8 h-8 mb-2 border-2 border-gray-300 border-t-green-700 rounded-full animate-spin"></div>
           <p class="text-sm font-medium">Memuat menu makanan...</p>
         </div>
         
@@ -120,7 +120,6 @@
 
     <!-- Floating Mobile Drawer Toggle -->
     <button v-if="!isCartOpen && isMobile" @click="isCartOpen = true" class="md:hidden fixed bottom-6 right-6 bg-green-800 text-white p-4 rounded-full shadow-2xl flex items-center gap-2 font-bold z-40 cursor-pointer">
-      <span>🛍️</span>
       <span v-if="cart.length > 0">{{ cart.length }} Item ({{ totalPortions }} Porsi)</span>
       <span v-else>Lihat Keranjang</span>
     </button>
@@ -128,8 +127,8 @@
     <!-- Beautiful Success Payment Modal -->
     <div v-if="showSuccessModal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in">
       <div class="bg-white rounded-3xl w-full max-w-sm overflow-hidden flex flex-col shadow-2xl p-6 text-center">
-        <div class="w-16 h-16 bg-green-50 text-green-700 rounded-full flex items-center justify-center text-3xl mx-auto mb-4 animate-bounce">
-          ✓
+        <div class="w-16 h-16 bg-green-50 text-green-700 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
         </div>
         <h3 class="text-xl font-black text-gray-900 mb-1">Pembayaran Berhasil!</h3>
         <p class="text-xs text-gray-400 mb-4">Transaksi #{{ lastTransaction.id || 'N/A' }} telah dicatat ke database</p>
@@ -286,7 +285,75 @@ const payNow = async () => {
 };
 
 const printReceipt = () => {
-  alert(`Simulasi mencetak struk belanja...\nTransaksi #${lastTransaction.value.id}\nLauk Terjual: ${lastTransaction.value.portions} Porsi\nTotal: Rp ${lastTransaction.value.total?.toLocaleString('id-ID')}\nPrinter POS: Mencetak Struk Termal...`);
+  const tx = lastTransaction.value;
+  const itemsHtml = tx.items.map(item =>
+    `<tr>
+      <td style="padding:4px 0">${item.name} x${item.qty}</td>
+      <td style="padding:4px 0;text-align:right">Rp ${(item.price * item.qty).toLocaleString('id-ID')}</td>
+    </tr>`
+  ).join('');
+
+  const receiptHtml = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Struk Pembayaran - Warteg POS</title>
+  <style>
+    @page { margin: 0; }
+    body { font-family: 'Courier New', Courier, monospace; font-size: 12px; width: 280px; margin: 0 auto; padding: 20px; color: #000; }
+    .header { text-align: center; margin-bottom: 12px; }
+    .header h1 { font-size: 16px; margin: 0 0 2px; letter-spacing: 2px; }
+    .header p { margin: 0; font-size: 10px; color: #333; }
+    .divider { border-top: 1px dashed #000; margin: 8px 0; }
+    .row { display: flex; justify-content: space-between; font-size: 11px; }
+    table { width: 100%; border-collapse: collapse; font-size: 11px; }
+    th { text-align: left; padding: 4px 0; border-bottom: 1px solid #000; font-size: 10px; }
+    .total { font-weight: bold; font-size: 14px; border-top: 1px solid #000; padding-top: 6px; margin-top: 4px; display: flex; justify-content: space-between; }
+    .footer { text-align: center; margin-top: 14px; font-size: 10px; color: #555; }
+    .info { font-size: 10px; color: #333; margin-bottom: 4px; }
+    @media print { body { padding: 10px; } }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>WARTEG POS</h1>
+    <p>Jl. Warung Tegal No. 1</p>
+    <p>========================</p>
+  </div>
+  <div class="info">
+    #${tx.id} &nbsp;|&nbsp; ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+  </div>
+  <div class="divider"></div>
+  <table>
+    <thead>
+      <tr><th>Item</th><th style="text-align:right">Subtotal</th></tr>
+    </thead>
+    <tbody>${itemsHtml}</tbody>
+  </table>
+  <div class="divider"></div>
+  <div class="total">
+    <span>TOTAL BAYAR</span>
+    <span>Rp ${tx.total.toLocaleString('id-ID')}</span>
+  </div>
+  <div class="row" style="margin-top:4px">
+    <span>Total Porsi</span>
+    <span>${tx.portions}</span>
+  </div>
+  <div class="footer">
+    <p>========================</p>
+    <p>Terima kasih sudah berbelanja!</p>
+    <p>~ Lauk warteg, nikmat dan hemat ~</p>
+  </div>
+</body>
+</html>`;
+
+  const printWindow = window.open('', '_blank', 'width=380,height=600');
+  if (printWindow) {
+    printWindow.document.write(receiptHtml);
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+  }
 };
 
 // Screen size detection for Mobile bottom sheet UI

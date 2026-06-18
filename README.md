@@ -35,6 +35,48 @@ npm run build
 
 ---
 
+## Deployment
+
+Production URLs:
+
+- Frontend: `https://warteg-frontend.vercel.app`
+- Backend: `https://warteg-backend-production.up.railway.app`
+- Backend health check: `https://warteg-backend-production.up.railway.app/api/health`
+
+### Backend on Railway
+
+1. Push this repository to GitHub.
+2. In Railway, create a new project from the GitHub repository.
+3. Set the service root directory to `warteg-backend`.
+4. Use these settings:
+   - Install command: `npm install`
+   - Start command: `npm start`
+5. Add these Railway variables:
+   - `SUPABASE_URL`
+   - `SUPABASE_KEY`
+   - `JWT_SECRET`
+6. Deploy, then open the generated Railway domain and test:
+   - `https://your-railway-domain.up.railway.app/api/health`
+
+Railway provides `PORT` automatically. Keep the backend `PORT=3000` only for local development.
+
+### Frontend on Vercel
+
+1. Create a new Vercel project from the same GitHub repository.
+2. Set the project root directory to `warteg-frontend`.
+3. Use these settings:
+   - Framework preset: `Vite`
+   - Install command: `npm install`
+   - Build command: `npm run build`
+   - Output directory: `dist`
+4. Add this Vercel environment variable:
+   - `VITE_API_BASE_URL=https://your-railway-domain.up.railway.app/api`
+5. Deploy the frontend.
+
+After both deployments finish, open the Vercel URL and verify login/register, menu loading, cashier checkout, and admin dashboard against the production backend.
+
+---
+
 ## Database Schemas
 
 The application is connected to a Supabase database with the following table models:

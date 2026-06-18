@@ -16,22 +16,14 @@
     <PosCashier 
       v-else-if="currentView === 'cashier'" 
       @logout="logout" 
-      @go-to-dashboard="currentView = 'admin'" 
+      @go-to-dashboard="goToDashboard" 
     />
     
     <AdminDashboard 
       v-else-if="currentView === 'admin'" 
       @logout="logout" 
-      @go-to-cashier="currentView = 'cashier'" 
+      @go-to-cashier="goToCashier" 
     />
-
-    <!-- Dev / Admin shortcuts for easier testing -->
-    <div class="fixed bottom-20 md:bottom-4 left-4 flex flex-wrap gap-2 z-50 max-w-xs opacity-75 hover:opacity-100 transition-opacity">
-      <button @click="currentView = 'login'" class="bg-gray-800 text-white text-[10px] px-2 py-1 rounded cursor-pointer shadow hover:bg-gray-900">Login</button>
-      <button @click="currentView = 'register'" class="bg-gray-800 text-white text-[10px] px-2 py-1 rounded cursor-pointer shadow hover:bg-gray-900">Register</button>
-      <button @click="currentView = 'cashier'" class="bg-blue-800 text-white text-[10px] px-2 py-1 rounded cursor-pointer shadow hover:bg-blue-900">Kasir</button>
-      <button @click="currentView = 'admin'" class="bg-blue-800 text-white text-[10px] px-2 py-1 rounded cursor-pointer shadow hover:bg-blue-900">Admin</button>
-    </div>
   </div>
 </template>
 
@@ -75,6 +67,38 @@ const handleLoginSuccess = (user) => {
 
 const handleRegisterSuccess = () => {
   currentView.value = 'login';
+};
+
+const goToDashboard = () => {
+  const userStr = localStorage.getItem('user');
+  if (userStr) {
+    try {
+      const user = JSON.parse(userStr);
+      if (user.role === 'admin') {
+        currentView.value = 'admin';
+        return;
+      }
+    } catch (e) {
+      console.error('Session error:', e);
+    }
+  }
+  logout();
+};
+
+const goToCashier = () => {
+  const userStr = localStorage.getItem('user');
+  if (userStr) {
+    try {
+      const user = JSON.parse(userStr);
+      if (user.role === 'admin') {
+        currentView.value = 'cashier';
+        return;
+      }
+    } catch (e) {
+      console.error('Session error:', e);
+    }
+  }
+  logout();
 };
 
 const logout = () => {

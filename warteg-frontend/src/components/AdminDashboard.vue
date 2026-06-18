@@ -16,6 +16,9 @@
         <button @click="activeTab = 'transactions'" :class="['w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all cursor-pointer', activeTab === 'transactions' ? 'bg-green-800 text-white shadow-md shadow-green-800/20' : 'text-gray-500 hover:bg-gray-50']">
           <span>🧾</span> Catatan Transaksi
         </button>
+        <button @click="activeTab = 'users'" :class="['w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all cursor-pointer', activeTab === 'users' ? 'bg-green-800 text-white shadow-md shadow-green-800/20' : 'text-gray-500 hover:bg-gray-50']">
+          <span>👥</span> Validasi Akun
+        </button>
       </nav>
       <div class="mt-auto border-t border-gray-100 pt-4 space-y-1">
         <button @click="$emit('go-to-cashier')" class="w-full text-left px-4 py-3 text-green-800 font-bold hover:bg-green-50 rounded-xl transition-colors flex items-center gap-2 cursor-pointer">
@@ -216,23 +219,98 @@
             </div>
           </div>
 
+          <!-- 4. VALIDASI AKUN TAB -->
+          <div v-if="activeTab === 'users'" class="space-y-4">
+            <div class="flex items-center justify-between">
+              <p class="font-bold text-xs text-gray-400 uppercase tracking-wider">Total Terdaftar: {{ userList.length }} Pengguna</p>
+              <span class="text-xs bg-white border border-gray-200 px-3 py-1 rounded-md font-semibold text-gray-500 shadow-sm">Validasi Staf</span>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+              <!-- Desktop Users Table -->
+              <table class="w-full text-left border-collapse hidden md:table">
+                <thead>
+                  <tr class="bg-gray-50 text-gray-400 text-[11px] font-bold uppercase tracking-wider border-b border-gray-100">
+                    <th class="p-4">Nama Lengkap</th>
+                    <th class="p-4">Username</th>
+                    <th class="p-4">Peran (Role)</th>
+                    <th class="p-4">Tanggal Daftar</th>
+                    <th class="p-4 text-center">Status Verifikasi</th>
+                    <th class="p-4 text-center">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="usr in userList" :key="usr.id" class="border-b border-gray-100 hover:bg-gray-50/50 transition-colors">
+                    <td class="p-4 font-bold text-sm text-gray-900">{{ usr.full_name }}</td>
+                    <td class="p-4 text-sm text-gray-500 font-medium">{{ usr.username }}</td>
+                    <td class="p-4 text-sm font-semibold text-gray-700">
+                      <span :class="['px-2 py-0.5 rounded text-[10px] uppercase font-bold', usr.role === 'admin' ? 'bg-purple-50 text-purple-700' : 'bg-blue-50 text-blue-700']">
+                        {{ usr.role === 'admin' ? 'Pemilik' : 'Kasir' }}
+                      </span>
+                    </td>
+                    <td class="p-4 text-xs text-gray-400">{{ formatDate(usr.created_at) }}</td>
+                    <td class="p-4 text-center">
+                      <span :class="['px-2.5 py-1 rounded-md text-[10px] font-bold tracking-wide uppercase', usr.is_verified ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-amber-50 text-amber-700 border border-amber-200']">
+                        {{ usr.is_verified ? 'Aktif' : 'Menunggu' }}
+                      </span>
+                    </td>
+                    <td class="p-4">
+                      <div class="flex justify-center gap-2">
+                        <button v-if="usr.id !== currentUser.id" @click="toggleUserVerification(usr)" :class="['px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer', usr.is_verified ? 'text-amber-700 bg-amber-50 hover:bg-amber-100' : 'text-white bg-green-800 hover:bg-green-900 shadow-sm shadow-green-900/10']">
+                          {{ usr.is_verified ? 'Tangguhkan' : 'Verifikasi' }}
+                        </button>
+                        <span v-else class="text-xs text-gray-400 italic font-medium p-1.5">Akun Anda</span>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <!-- Mobile Users List -->
+              <div class="md:hidden divide-y divide-gray-100">
+                <div v-for="usr in userList" :key="usr.id" class="p-4 space-y-3 hover:bg-gray-50">
+                  <div class="flex justify-between items-start">
+                    <div>
+                      <h4 class="font-bold text-sm text-gray-900">{{ usr.full_name }}</h4>
+                      <p class="text-[11px] text-gray-400 font-semibold uppercase tracking-wider">@{{ usr.username }} &bull; {{ usr.role === 'admin' ? 'Pemilik' : 'Kasir' }}</p>
+                    </div>
+                    <span :class="['text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded', usr.is_verified ? 'text-green-600 bg-green-50' : 'text-amber-600 bg-amber-50']">
+                      {{ usr.is_verified ? 'Aktif' : 'Menunggu' }}
+                    </span>
+                  </div>
+                  <div class="flex justify-between items-center text-xs text-gray-400">
+                    <span>Daftar: {{ formatDate(usr.created_at) }}</span>
+                    <button v-if="usr.id !== currentUser.id" @click="toggleUserVerification(usr)" :class="['px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer', usr.is_verified ? 'text-amber-700 bg-amber-50 hover:bg-amber-100' : 'text-white bg-green-800 hover:bg-green-900']">
+                      {{ usr.is_verified ? 'Tangguhkan' : 'Verifikasi' }}
+                    </button>
+                    <span v-else class="italic font-medium">Akun Anda</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </main>
 
     <!-- Mobile Bottom Navigation -->
     <nav class="md:hidden fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 flex justify-around pb-safe z-40 shadow-xl">
-      <button @click="activeTab = 'dashboard'" :class="['flex flex-col items-center pt-3 pb-2 w-1/3 transition-all cursor-pointer', activeTab === 'dashboard' ? 'text-green-800 font-black border-t-2 border-green-800' : 'text-gray-400']">
+      <button @click="activeTab = 'dashboard'" :class="['flex flex-col items-center pt-3 pb-2 w-1/4 transition-all cursor-pointer', activeTab === 'dashboard' ? 'text-green-800 font-black border-t-2 border-green-800' : 'text-gray-400']">
         <span class="text-xl mb-0.5">📊</span>
         <span class="text-[10px] uppercase font-bold tracking-wide">Dashboard</span>
       </button>
-      <button @click="activeTab = 'menu'" :class="['flex flex-col items-center pt-3 pb-2 w-1/3 transition-all cursor-pointer', activeTab === 'menu' ? 'text-green-800 font-black border-t-2 border-green-800' : 'text-gray-400']">
+      <button @click="activeTab = 'menu'" :class="['flex flex-col items-center pt-3 pb-2 w-1/4 transition-all cursor-pointer', activeTab === 'menu' ? 'text-green-800 font-black border-t-2 border-green-800' : 'text-gray-400']">
         <span class="text-xl mb-0.5">🍲</span>
         <span class="text-[10px] uppercase font-bold tracking-wide">Lauk</span>
       </button>
-      <button @click="activeTab = 'transactions'" :class="['flex flex-col items-center pt-3 pb-2 w-1/3 transition-all cursor-pointer', activeTab === 'transactions' ? 'text-green-800 font-black border-t-2 border-green-800' : 'text-gray-400']">
+      <button @click="activeTab = 'transactions'" :class="['flex flex-col items-center pt-3 pb-2 w-1/4 transition-all cursor-pointer', activeTab === 'transactions' ? 'text-green-800 font-black border-t-2 border-green-800' : 'text-gray-400']">
         <span class="text-xl mb-0.5">🧾</span>
         <span class="text-[10px] uppercase font-bold tracking-wide">Transaksi</span>
+      </button>
+      <button @click="activeTab = 'users'" :class="['flex flex-col items-center pt-3 pb-2 w-1/4 transition-all cursor-pointer', activeTab === 'users' ? 'text-green-800 font-black border-t-2 border-green-800' : 'text-gray-400']">
+        <span class="text-xl mb-0.5">👥</span>
+        <span class="text-[10px] uppercase font-bold tracking-wide">Validasi</span>
       </button>
     </nav>
 
@@ -422,13 +500,15 @@ const addForm = reactive({
 const pageTitle = computed(() => {
   if (activeTab.value === 'dashboard') return 'Ringkasan Penjualan';
   if (activeTab.value === 'menu') return 'Manajemen Lauk';
-  return 'Catatan Transaksi';
+  if (activeTab.value === 'transactions') return 'Catatan Transaksi';
+  return 'Validasi Akses Akun';
 });
 
 const pageSubtitle = computed(() => {
   if (activeTab.value === 'dashboard') return 'Pantau performa omzet dan lauk warteg Anda secara real-time.';
   if (activeTab.value === 'menu') return 'Kelola daftar menu, atur harga, dan perbarui ketersediaan lauk hari ini.';
-  return 'Daftar riwayat penjualan kasir harian.';
+  if (activeTab.value === 'transactions') return 'Daftar riwayat penjualan kasir harian.';
+  return 'Setujui atau tangguhkan akses akun karyawan (kasir) untuk menggunakan sistem POS.';
 });
 
 const todayFormatted = computed(() => {
@@ -483,10 +563,34 @@ const refreshAllData = async () => {
     // 3. Fetch Transactions
     const txData = await api.transactions.getAll();
     transactions.value = txData;
+
+    // 4. Fetch Users for account validation
+    try {
+      const usersData = await api.users.getAll();
+      userList.value = usersData;
+    } catch (usersErr) {
+      console.warn('Fallback: Could not load user validation list.', usersErr.message);
+    }
   } catch (error) {
     console.error('Error refreshing admin dashboard data:', error);
   } finally {
     isLoadingData.value = false;
+  }
+};
+
+const userList = ref([]);
+
+const toggleUserVerification = async (usr) => {
+  const newStatus = !usr.is_verified;
+  const actionText = newStatus ? 'memverifikasi' : 'menangguhkan';
+  if (!confirm(`Apakah Anda yakin ingin ${actionText} akun ${usr.full_name}?`)) return;
+
+  try {
+    await api.users.verify(usr.id, newStatus);
+    alert(`Akun ${usr.full_name} berhasil ${newStatus ? 'diverifikasi' : 'ditangguhkan'}!`);
+    await refreshAllData();
+  } catch (error) {
+    alert(error.message || 'Gagal mengubah status verifikasi akun');
   }
 };
 

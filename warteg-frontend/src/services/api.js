@@ -93,5 +93,15 @@ export const api = {
   // Dashboard Stats
   dashboard: {
     getStats: () => request('/dashboard/stats')
+  },
+
+  // Users (Admin Validation)
+  users: {
+    getAll: () => request('/users'),
+    verify: (id, isVerified) => 
+      request(`/users/${id}/verify`, {
+        method: 'PUT',
+        body: { is_verified: isVerified }
+      })
   }
 };

@@ -54,7 +54,8 @@ app.post('/api/auth/register', async (req, res) => {
         full_name: name,
         username,
         password_hash,
-        role: role || 'admin'
+        role: role || 'admin',
+        is_verified: (role || 'admin') === 'admin' // Admins auto-verified, Cashiers need approval
       }])
       .select();
 
@@ -121,7 +122,8 @@ app.post('/api/auth/login', async (req, res) => {
         id: user.id,
         name: user.full_name,
         username: user.username,
-        role: user.role
+        role: user.role,
+        is_verified: user.is_verified
       }
     });
   } catch (error) {
@@ -131,7 +133,28 @@ app.post('/api/auth/login', async (req, res) => {
 
 // Cek Profil / Verifikasi Session (Me)
 app.get('/api/auth/me', authenticateJWT, async (req, res) => {
-  res.json({ user: req.user });
+  try {
+    const { data: users, error } = await supabase
+      .from('users')
+      .select('id, full_name, username, role, is_verified')
+      .eq('id', req.user.id);
+
+    if (error || !users || users.length === 0) {
+      return res.status(401).json({ error: 'User tidak ditemukan' });
+    }
+    
+    res.json({
+      user: {
+        id: users[0].id,
+        name: users[0].full_name,
+        username: users[0].username,
+        role: users[0].role,
+        is_verified: users[0].is_verified
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // ==========================================
@@ -404,6 +427,51 @@ app.get('/api/dashboard/stats', async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+});
+
+// ==========================================
+// 5. ENDPOINT MANAJEMEN PENGGUNA (Admin Validation)
+// ==========================================
+
+// Ambil semua pengguna terdaftar (Admin)
+app.get('/api/users', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('users')
+      .select('id, full_name, username, role, is_verified, created_at')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Setujui atau Tangguhkan verifikasi Pengguna (Admin)
+app.put('/api/users/:id/verify', async (req, res) => {
+  const { id } = req.params;
+  const { is_verified } = req.body;
+  
+  try {
+    const { data, error } = await supabase
+      .from('users')
+      .update({ is_verified: is_verified === true || is_verified === 'true' })
+      .eq('id', id)
+      .select();
+
+    if (error) throw error;
+    if (!data || data.length === 0) {
+      return res.status(404).json({ error: 'Pengguna tidak ditemukan' });
+    }
+    
+    res.json({
+      message: 'Status verifikasi berhasil diperbarui',
+      user: data[0]
+    });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
   }
 });
 

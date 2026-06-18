@@ -3,3 +3,5 @@ dist/
 warteg-backend/.env
 .DS_Store
 *.log
+*.md
+.omo/
